@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	@Query("SELECT DISTINCT u FROM User WHERE u.fullName LIKE %:query% OR u.email LIKE %:query%")
 	public List<User>searchUser(@Param("query")String query);
 	
-	//for example code is usrname and yoou type code then it match then return user .if not match then return false
+	//for example code is usrname and you type code then it match then return user .if not match then return false
 	
 	
 }
