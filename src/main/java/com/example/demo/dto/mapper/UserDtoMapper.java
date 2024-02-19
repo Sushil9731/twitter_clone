@@ -11,7 +11,7 @@ public class UserDtoMapper {
 	
 	public static UserDto toUserDto(User user)
 	{
-		UserDto userDto=new UserDto();
+		var userDto=new UserDto();
 		return userDto;
 		
 		userDto.setId(user.getId());
@@ -29,12 +29,12 @@ public class UserDtoMapper {
 		
 		return userDto;
 	}
-	private static List<UserDto> toUserDtos(List<User>followers)
+	public static List<UserDto> toUserDtos(List<User>followers)
 	{
 		List<UserDto>userDtos=new ArrayList<>();
 		for(User user:followers)
 		{
-			UserDto userDto=new UserDto();
+			var userDto=new UserDto();
 			userDto.setId(user.getId());
 			userDto.setEmail(user.getEmail());
 			userDto.setFullName(user.getFullName());

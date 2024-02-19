@@ -1,5 +1,7 @@
 package com.example.demo.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -88,17 +90,37 @@ public class TwitController {
 	}
 	
 	@GetMapping("/")
-	public ResponseEntity<TwitDto>getAllTwits(@RequestHeader("Authorization")String jwt)throws UserException,TwitException 
+	public ResponseEntity<List<TwitDto>>getAllTwits(@RequestHeader("Authorization")String jwt)throws UserException,TwitException 
 	{
 		User user=userService.findUserProfileByJwt(jwt);
-		Twit twit=twitService.findAllTwit();
-		var twitDto=TwitDtoMapper.toTwitDto(twit, user);
+		var twits=twitService.findAllTwit();
+		var twitDtos=TwitDtoMapper.toTwitDtos(twits, user);
 		
 		
-		return new ResponseEntity<>(twitDto,HttpStatus.OK);
+		return new ResponseEntity<>(twitDtos,HttpStatus.OK);
 	}
-	
-	
+	@GetMapping("/user/{userId}")
+	public ResponseEntity<List<TwitDto>>getUsersAllTwits(@PathVariable Long userId,@RequestHeader("Authorization")String jwt)throws UserException,TwitException 
+	{
+		User user=userService.findUserProfileByJwt(jwt);
+		var twits=twitService.getUserTwit(user);
+		
+		var twitDtos=TwitDtoMapper.toTwitDtos(twits, user);
+		
+		
+		return new ResponseEntity<>(twitDtos,HttpStatus.OK);
+	}
+	@GetMapping("/user/{userId}/likes")
+	public ResponseEntity<List<TwitDto>>findTwitByLikesContainsUser(@PathVariable Long userId,@RequestHeader("Authorization")String jwt)throws UserException,TwitException 
+	{
+		User user=userService.findUserProfileByJwt(jwt);
+		var twits=twitService.findByLikesContainsUser(user);
+		
+		var twitDtos=TwitDtoMapper.toTwitDtos(twits, user);
+		
+		
+		return new ResponseEntity<>(twitDtos,HttpStatus.OK);
+	}
 	
 	
 	
