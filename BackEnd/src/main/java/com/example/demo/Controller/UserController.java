@@ -1,8 +1,8 @@
 package com.example.demo.Controller;
 
+
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,32 +18,50 @@ import com.example.demo.dto.UserDto;
 import com.example.demo.dto.mapper.UserDtoMapper;
 import com.example.demo.exception.UserException;
 import com.example.demo.model.User;
-import com.example.demo.services.UserService;
+import com.example.demo.service.UserService;
 import com.example.demo.util.UserUtil;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name="User Management", description = "Endpoints for managing user profiles and information")
 public class UserController {
 
-	@Autowired
-	private UserService userService;
+private UserService userService;
+	
+	public UserController(UserService userService) {
+		this.userService=userService;
+	}
+	
 	@GetMapping("/profile")
-	public ResponseEntity<UserDto>getUserProfile(@RequestHeader("Authorization")String jwt)throws UserException
-	{
-		
+	 @Operation(
+	            summary = "Get user profile details",
+	            description = "REST API to fetch user's profile details based on a jwt"
+	    )
+	public ResponseEntity<UserDto> getUserProfileHandler(@RequestHeader("Authorization") String jwt) 
+			throws UserException{
+
 		User user=userService.findUserProfileByJwt(jwt);
+		user.setPassword(null);
+		user.setReq_user(true);
 		var userDto=UserDtoMapper.toUserDto(user);
 		userDto.setReq_user(true);
 		return new ResponseEntity<>(userDto,HttpStatus.ACCEPTED);
 	}
 	
-	@GetMapping("/{userid}")
-	public ResponseEntity<UserDto>getUserById(@PathVariable Long userId,@RequestHeader("Authorization")String jwt)throws UserException
-	{
+	@GetMapping("/{userId}")
+	public ResponseEntity<UserDto> getUserByIdHandler(@PathVariable Long userId, 
+			@RequestHeader("Authorization") String jwt) 
+			throws UserException{
 		
-		User requser=userService.findUserProfileByJwt(jwt);
+		User reqUser=userService.findUserProfileByJwt(jwt);
 		
-		User user=userService.findUserById(userId);
+		var user=userService.findUserById(userId);
+		
+//		user.setReq_user(UserUtil.isReqUser(reqUser, user));
+		
 		var userDto=UserDtoMapper.toUserDto(user);
 		userDto.setReq_user(UserUtil.isReqUser(reqUser, user));
 		userDto.setFollowed(UserUtil.isFollowedByReqUser(reqUser, user));
@@ -51,46 +69,47 @@ public class UserController {
 	}
 	
 	@GetMapping("/search")
-	public ResponseEntity<List<UserDto>>searchUser(@RequestParam String query,@RequestHeader("Authorization")String jwt)throws UserException
-	{
+	public ResponseEntity<List<UserDto>> searchUserHandler(@RequestParam String query, 
+			@RequestHeader("Authorization") String jwt) 
+			throws UserException{
 		
-		User requser=userService.findUserProfileByJwt(jwt);
+		User reqUser=userService.findUserProfileByJwt(jwt);
 		
-		List<User> users=userService.searchUser(query);
+		var users=userService.searchUser(query);
+		
+//		user.setReq_user(UserUtil.isReqUser(reqUser, user));
+		
 		var userDtos=UserDtoMapper.toUserDtos(users);
-		//userDto.setReq_user(UserUtil.isReqUser(reqUser, user));
-		//userDto.setFollowed(UserUtil.isFollowedByReqUser(reqUser, user));
+		
 		return new ResponseEntity<>(userDtos,HttpStatus.ACCEPTED);
 	}
 	
-	
-	
 	@PutMapping("/update")
-	public ResponseEntity<UserDto>searchUser(@RequestBody User req,@RequestHeader("Authorization")String jwt)throws UserException
-	{
+	public ResponseEntity<UserDto> updateUserHandler(@RequestBody User req, 
+			@RequestHeader("Authorization") String jwt) 
+			throws UserException{
+
+		System.out.println("update user  "+req);
+		User user=userService.findUserProfileByJwt(jwt);
 		
-		User requser=userService.findUserProfileByJwt(jwt);
-		
-		User user=userService.updateUser(reqUser.getId(),req);
+		User updatedUser=userService.updateUser(user.getId(), req);
+		updatedUser.setPassword(null);
 		var userDto=UserDtoMapper.toUserDto(user);
-		//userDto.setReq_user(UserUtil.isReqUser(reqUser, user));
-		//userDto.setFollowed(UserUtil.isFollowedByReqUser(reqUser, user));
+		userDto.setReq_user(true);
 		return new ResponseEntity<>(userDto,HttpStatus.ACCEPTED);
 	}
-	
-	
 	
 	@PutMapping("/{userId}/follow")
-	public ResponseEntity<UserDto>searchUser(@PathVariable Long userId,@RequestHeader("Authorization")String jwt)throws UserException
-	{
+	public ResponseEntity<UserDto> followUserHandler(@PathVariable Long userId, @RequestHeader("Authorization") String jwt) 
+			throws UserException{
 		
-		User requser=userService.findUserProfileByJwt(jwt);
+		User user=userService.findUserProfileByJwt(jwt);
 		
-		User user=userService.followUser(userId,reqUser);
-		var userDto=UserDtoMapper.toUserDto(user);
-		userDto.setFollowed(UserUtil.isFollowedByReqUser(reqUser, user));
-		
+		var updatedUser=userService.followUser(userId, user);
+		var userDto=UserDtoMapper.toUserDto(updatedUser);
+		userDto.setFollowed(UserUtil.isFollowedByReqUser(user, updatedUser));
 		return new ResponseEntity<>(userDto,HttpStatus.ACCEPTED);
 	}
 	
+
 }

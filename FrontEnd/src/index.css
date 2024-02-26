@@ -7,10 +7,26 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+p{
+  margin: 0;
+  padding: 0;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* For webkit-based browsers (Chrome, Safari) */
+.hideScrollbar::-webkit-scrollbar {
+  
+  display: none;
+}
+
+
+
+
+
 
 @tailwind base;
 @tailwind components;

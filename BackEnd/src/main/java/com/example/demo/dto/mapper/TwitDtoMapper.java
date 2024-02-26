@@ -7,25 +7,23 @@ import com.example.demo.dto.TwitDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.model.Twit;
 import com.example.demo.model.User;
-import com.example.demo.util.TwitUtil;
-
+import com.example.demo.util.TweetUtil;
 
 public class TwitDtoMapper {
-
 	
-	public static TwitDto toTwitDto(Twit twit,User reqUser)
-	{
-		
+	public static TwitDto toTwitDto(Twit twit,User reqUser) {
 		UserDto user=UserDtoMapper.toUserDto(twit.getUser());
-		boolean isLiked=TwitUtil.isLikedByReqUser(reqUser,twit);
-		boolean isRetwited=TwitUtil.isRetwitedByReqUser(reqUser,twit);
-		List<Long>retwitUserId=new ArrayList<>();
-		for(User user1:twit.getRetwitUser())
-		{
+		
+		boolean isLiked=TweetUtil.isLikedByReqUser(reqUser, twit);
+		boolean isRetwited=TweetUtil.isLikedByReqUser(reqUser, twit);
+		
+		List<Long> retwitUserId=new ArrayList<>();
+		
+		for(User user1 : twit.getRetwitUser()) {
 			retwitUserId.add(user1.getId());
 		}
 		
-		TwitDto twitDto=new TwitDto();
+		var twitDto=new TwitDto();
 		twitDto.setId(twit.getId());
 		twitDto.setContent(twit.getContent());
 		twitDto.setCreatedAt(twit.getCreatedAt());
@@ -36,37 +34,42 @@ public class TwitDtoMapper {
 		twitDto.setUser(user);
 		twitDto.setLiked(isLiked);
 		twitDto.setRetwit(isRetwited);
-		twitDto.setRetwitUserId(retwitUserId);
-		twitDto.setReplyTwits(twit.getReplyTwits(),reqUser());
+		twitDto.setRetwitUsersId(retwitUserId);
+		twitDto.setReplyTwits(toTwitDtos(twit.getReplyTwits(), reqUser));
 		twitDto.setVideo(twit.getVideo());
+		
 		
 		return twitDto;
 	}
 	
-	public static List<TwitDto>toTwitDtos(List<Twit>twits,User reqUser)
-	{
-		List<TwitDto>twitDtos=new ArrayList<>();
-		for(Twit twit:twits)
-		{
-			TwitDto twitDto=toReplyTwitDto(twit,reqUser);
+	public static List<TwitDto> toTwitDtos(List<Twit> twits, User reqUser) {
+		
+		List<TwitDto> twitDtos=new ArrayList<>();
+		
+		for(Twit twit : twits) {
+		
+			var twitDto=toReplyTwitDto(twit, reqUser);
+		
 			twitDtos.add(twitDto);
 		}
+		
+		
 		return twitDtos;
-			}
-
-	private static TwitDto toReplyTwitDto(Twit twit, User reqUser) {
-		
-		
+	}
+	
+	public static TwitDto toReplyTwitDto(Twit twit, User reqUser) {
 		UserDto user=UserDtoMapper.toUserDto(twit.getUser());
-		boolean isLiked=TwitUtil.isLikedByReqUser(reqUser,twit);
-		boolean isRetwited=TwitUtil.isRetwitedByReqUser(reqUser,twit);
-		List<Long>retwitUserId=new ArrayList<>();
-		for(User user1:twit.getRetwitUser())
-		{
+		
+		boolean isLiked=TweetUtil.isLikedByReqUser(reqUser, twit);
+		boolean isRetwited=TweetUtil.isLikedByReqUser(reqUser, twit);
+		
+		List<Long> retwitUserId=new ArrayList<>();
+		
+		for(User user1 : twit.getRetwitUser()) {
 			retwitUserId.add(user1.getId());
 		}
 		
-		TwitDto twitDto=new TwitDto();
+		var twitDto=new TwitDto();
 		twitDto.setId(twit.getId());
 		twitDto.setContent(twit.getContent());
 		twitDto.setCreatedAt(twit.getCreatedAt());
@@ -77,9 +80,13 @@ public class TwitDtoMapper {
 		twitDto.setUser(user);
 		twitDto.setLiked(isLiked);
 		twitDto.setRetwit(isRetwited);
-		twitDto.setRetwitUserId(retwitUserId);
+		twitDto.setRetwitUsersId(retwitUserId);
 		twitDto.setVideo(twit.getVideo());
 		
 		return twitDto;
 	}
+	
+	
+
+
 }

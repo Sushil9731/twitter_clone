@@ -1,7 +1,6 @@
 package com.example.demo.config;
 
 public class JwtConstant {
-
-	public static final String SECRET_KEY="abcfgbnmnopqgbhhbcfhuygcxsefbnkiug";
+	public static final String SECRET_KEY="wpembytrwcvnryxksdbqwjebruyGHyudqgwveytrtrCSnwifoesarjbwe";
 	public static final String JWT_HEADER="Authorization";
 }

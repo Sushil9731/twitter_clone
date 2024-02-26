@@ -18,7 +18,8 @@ import {
 import TwitCard from "../Home/MiddlePart/TwitCard/TwitCard";
 import ProfileModel from "./ProfileModel";
 import { FollowUserAction, findUserById } from "../../Store/Auth/Action";
-import SnackbarComponent from "../Snackbar/SnackbarComponent";
+import SnackbarComponent from '../Snackbar/SnackbarComponent';
+
 
 const Profile = () => {
   const [tabValue, setTabValue] = React.useState("1");

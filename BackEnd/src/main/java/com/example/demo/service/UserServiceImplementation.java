@@ -2,100 +2,108 @@ package com.example.demo.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.config.JwtProvider;
 import com.example.demo.exception.UserException;
 import com.example.demo.model.User;
-import com.example.demo.repositories.UserRepository;
+import com.example.demo.repository.UserRepository;
 
 @Service
-public class UserServiceImplementation implements UserService{
-
-	@Autowired
-	private UserRepository userRepository;
+public class UserServiceImplementation implements UserService {
 	
-	@Autowired
+	private UserRepository userRepository;
 	private JwtProvider jwtProvider;
 	
+	public UserServiceImplementation(
+			UserRepository userRepository,
+			JwtProvider jwtProvider) {
+		
+		this.userRepository=userRepository;
+		this.jwtProvider=jwtProvider;
+		
+	}
+
 	@Override
 	public User findUserById(Long userId) throws UserException {
-		User user=userRepository.findById(userId).orElseThrow(()->new UserException("user not found with id"+userId));
+		var user=userRepository.findById(userId).orElseThrow(() ->  new UserException("user not found with id "+userId));
 		return user;
 	}
 
 	@Override
-	public User findUserProfileBtJwt(String jwt) throws UserException {
-		String email=jwtProvider.getEmailFromToken(jwt);
-		User user=userRepository.findByEmail(email);
+	public User findUserProfileByJwt(String jwt) throws UserException {
 		
-		if(user==null)
-		{
-			throw new UserException("User not found with email"+email);
+		var email=jwtProvider.getEmailFromJwtToken(jwt);
+		
+		System.out.println("email"+email);
+		
+		var user=userRepository.findByEmail(email);
+		
+		if(user==null) {
+			throw new UserException("user not exist with email "+email);
 		}
+		System.out.println("email user"+user.getEmail());
 		return user;
 	}
 
 	@Override
-	public User updateUser(Long userId, User req) throws UserException {
-		User user=findUserById(userId);
+	public User updateUser(Long userid,User req) throws UserException {
 		
-		if(req.getFullName()!=null)
-		{
-			user.set.FullName(req.getFullName());
+		var user=findUserById(userid);
+		
+		if(req.getFullName()!= null) {
+			user.setFullName(req.getFullName());
 		}
-		if(req.getImage()!=null)
-		{
+		if(req.getImage()!=null) {
 			user.setImage(req.getImage());
 		}
-		if(req.getBackgroundImage()!=null)
-		{
+		if(req.getBackgroundImage()!=null) {
 			user.setBackgroundImage(req.getBackgroundImage());
 		}
-		if(req.getBirtDate()!=null)
-		{
+		if(req.getBirthDate()!=null) {
 			user.setBirthDate(req.getBirthDate());
 		}
-		if(req.getLocation()!=null)
-		{
+		if(req.getLocation()!=null) {
 			user.setLocation(req.getLocation());
 		}
-		if(req.getBio()!=null)
-		{
+		if(req.getBio()!=null) {
 			user.setBio(req.getBio());
 		}
-		if(req.getWebsite()!=null)
-		{
+		if(req.getWebsite()!=null) {
 			user.setWebsite(req.getWebsite());
 		}
+		
 		return userRepository.save(user);
+		
 	}
 
 	@Override
 	public User followUser(Long userId, User user) throws UserException {
-		User followToUser=findUserById(userId);
+		var followToUser=findUserById(userId);
 		
-		if(user.getFollowings().contains(followToUser) && followToUser.getFollowers().contains(user))
-		{
+		if(user.getFollowings().contains(followToUser) && followToUser.getFollowers().contains(user)) {
 			user.getFollowings().remove(followToUser);
 			followToUser.getFollowers().remove(user);
 		}
-		else
-		{
-			user.getFollowings().add(followToUser);
-			followToUser.getFollowers().add(user);
+		else {
+					followToUser.getFollowers().add(user);
+					user.getFollowings().add(followToUser);
 		}
-		userRepository.save(followToUser);
+		
 		userRepository.save(user);
+		userRepository.save(followToUser);
 		return followToUser;
 	}
 
 	@Override
 	public List<User> searchUser(String query) {
-		
-		
+	
 		return userRepository.searchUser(query);
 	}
 
 }
+   
+
+
+
+
